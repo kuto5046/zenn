@@ -1,5 +1,5 @@
 ---
-title: "Reinforcement Fine Tuningの新しいパラダイム。Agentic RLのサーベイ論文を読む"
+title: "Reinforcement Fine Tuningの新しいパラダイム。Agentic RLの論文紹介"
 emoji: "🔥"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["強化学習", "LLM", "エージェント"]
@@ -136,7 +136,7 @@ RAG形式の検索メカニズムを強化学習で最適化するアプロー�
 1. Retrieverによって検索された記憶の候補をRerankerが絞り込む
 2. LLMがその記憶を用いて応答を生成する際、実際にどの記憶を引用したかを自己評価する
 3. 引用された記憶には正の報酬（+1）、されなかった記憶には負の報酬（-1）を与えてRerankerのパラメータを更新する
-
+r
 この一連の処理をオンライン強化学習することで、対話を通じて「LLMが本当に必要とする記憶」をより的確に選択できるようRerankerを継続的に学習しています。
 
 ![alt text](/images/agentic_rl/prospect.png)
