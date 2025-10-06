@@ -1,5 +1,5 @@
 ---
-title: "Reinforcement Fine Tuningの新しいパラダイム。Agentic RLの論文紹介"
+title: "LLM x 強化学習の新しいパラダイム Agentic RLの研究動向"
 emoji: "🔥"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["強化学習", "LLM", "エージェント"]
@@ -7,18 +7,22 @@ published: false
 ---
 
 ## はじめに
-この記事ではLLM研究において盛り上がりを見せているAgentic Reinforcement Learningのサーベイ論文
-「The Landscape of Agentic Reinforcement Learning for LLMs: A Survey」^[[The Landscape of Agentic Reinforcement Learning for LLMs: A Survey](https://arxiv.org/abs/2509.02547)]を読んで私が理解した内容について紹介します。
+この記事ではLLM研究で注目を集めるAgentic Reinforcement Learningのサーベイ
+「The Landscape of Agentic Reinforcement Learning for LLMs: A Survey」^[[The Landscape of Agentic Reinforcement Learning for LLMs: A Survey](https://arxiv.org/abs/2509.02547)]を読み、私なりの理解と要点を整理して紹介します。
+https://arxiv.org/abs/2509.02547
 
-はじめにこの記事についていくつか前提を話しておくと
-- 各トピックにおいて私が重要と感じたり面白いなと思ったものをピックアップして紹介していきます。
+この記事の前提事項
+- 各トピックにおいて私がが重要と感じたり面白いなと思ったものをピックアップして紹介していきます。
+- REINFORCE,PPO,GRPOといったRLアルゴリズムに関する説明は他の多くの記事ですでにされているためこの記事での説明は省略します。
 - DeepSeek-R1の研究を前提として話している部分がいくつかあるので、DeepSeek-R1を知らない方は原著の論文か解説記事を読むことをお勧めします。私は以下のブログに大変お世話になりました。
-    - https://zenn.dev/asap/articles/34237ad87f8511
-    - https://horomary.hatenablog.com/entry/2025/01/26/204545
-- REINFORCE,PPO,GRPOといったRLアルゴリズムに関する説明は他の多くの記事ですでにされているためこの記事での説明は省略します
 
-## LLM x 強化学習の歴史的背景
-Agentic RLの話に入る前に、まずはLLMに対して強化学習がどのように適用されてきたかを振り返ってみようと思います。
+https://zenn.dev/asap/articles/34237ad87f8511
+
+https://horomary.hatenablog.com/entry/2025/01/26/204545
+
+
+## LLM×強化学習の歴史
+Agentic RLの話に入る前に、まずはLLMに対して強化学習がどのように適用されてきたかを簡単に振り返っていきます。
 
 ### 選好チューニング
 2022年11月のChatGPTの登場によりLLMを用いた対話システムが急速に普及しました。LLMは通常Webから収集された大量のテキストコーパスによる事前学習を実施した後に、人間の指示に従って応答するような振る舞いを獲得するため指示チューニング(Instruction Tuning)を実施します。これは人間が生成したプロンプトと応答ペアに基づいてモデルを教師あり学習するものです。
@@ -27,7 +31,7 @@ RLHF(Reinforcement Learning from Human Feedback)はその代表例で、LLMの�
 RLHFの他にもLLMの自己生成データを用いて好ましい出力を強化するRLAIF(Reinforcement Learning with AI Feedback)や報酬モデルや強化学習の枠組みを利用せずに人間の好みを直接学習するDPO(Direct Preference Optimization)などがあります。これらの選好チューニングを目的とした強化学習をこの論文では従来のRLと位置付けています。この記事ではこれらを総称してPBRFT(Preference Based Reinforcement Fine Tuning)と呼ぶことにします。
 
 ### 推論能力の向上
-初期の強化学習のLLM適用は選好チューニングが主でしたが2024年9月にOpenAIから初の推論モデルであるOpenAI o1が発表されました。強化学習を利用することで長考して答えを導き出す能力を向上させたことがシステムカード^[[OpenAI o1 System Card](https://cdn.openai.com/o1-system-card-20241205.pdf)]で報告されています。このレポートでは具体的な強化学習の手法についての情報公開されていませんでしたが、2025年1月に登場したDeepSeek-R1^[[DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning](https://arxiv.org/abs/2501.12948)]によって、価値評価モデルを不要とするGRPOというRLアルゴリズムや答えが一意に定まる問題設定に対してルールベース報酬を利用することで報酬モデルを取り除くなど、具体的な手法とともに強化学習がLLMの推論能力と汎化能力を飛躍的に向上させることが示されました。これを機にアライメント目的であった従来の利用方法から、LLMの能力を向上させる目的で強化学習を適用する研究が活発化し、この流れがこの記事の主題でもあるAgentic RLに繋がってきています。
+初期の強化学習のLLM適用は選好チューニングが主でしたが2024年9月にOpenAIから初の推論モデルであるOpenAI o1が発表されました。強化学習を利用することで長考して答えを導き出す能力を向上させたことがシステムカード^[[OpenAI o1 System Card](https://cdn.openai.com/o1-system-card-20241205.pdf)]で報告されています。このレポートでは具体的な強化学習の手法についての情報公開されていませんでしたが、2025年1月に登場したDeepSeek-R1^[[DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning](https://arxiv.org/abs/2501.12948)]によって、価値評価モデルを不要とするGRPOというRLアルゴリズムや答えが一意に定まる問題設定に対してルールベース報酬(検証可能な報酬Verified Rewardとも言われます)を利用することで報酬モデルを取り除くなど、具体的な手法とともに強化学習がLLMの推論能力と汎化能力を飛躍的に向上させることが示されました。これを機にアライメント目的であった従来の利用方法から、LLMの能力を向上させる目的で強化学習を適用する研究が活発化し、この流れがこの記事の主題でもあるAgentic RLに繋がってきています。
 
 ### ツール利用性能の向上
 2025年2月に発表され今では当たり前となっているweb検索を使ってレポートを作成してくれるDeep Researchにも強化学習が適用されていることが報告されています。
@@ -211,17 +215,16 @@ Agentic RLはさまざまなタスク領域で応用が始まっており、こ�
 検索・調査エージェントは、外部の知識ベースやウェブ検索エンジンを活用して、ユーザーの質問や調査依頼に対して正確かつ包括的な回答を提供することを目的としています。
 LLMに検索能力を付与する方法としてRAGが広く用いられていますが、検索と推論を交互に行うような複雑なマルチターンタスクに対しては学習を行わないプロンプトベースの手法では限界があることから、検索クエリの生成、検索、推論をend2endで直接最適化するためにRLを利用する研究が進展しています。
 
-主要な研究の一つは、RAGの基盤を活用しつつウェブ検索APIを利用して、クエリ生成と多段階の推論をRLで最適化するアプローチです。
-どういう流れで研究が発展しているか？特に見ておくべき研究は？
-- DeepRetrieval
-![alt text](/images/agentic_rl/deep_retrieval.png)
+主要な研究の一つは、RAGの基盤を活用しつつweb検索APIを利用して、クエリ生成と多段階の推論をRLで最適化するアプローチです。
+search-R1は`<think>`(思考), `<search>`(検索クエリ),`<information>`(検索結果), `<answer>`(回答)という4つの特殊トークンを導入し、思考と検索を複数ターン繰り返し最終回答をするプロセスをPPOやGRPOといったRLアルゴリズムで学習します。思考、検索クエリ、回答をそれぞれ行動として扱い、最終的な回答が正解かどうかを報酬として与えることで検索と推論の両方の能力を向上させています。また`<information>`(検索結果)に対しては損失計算を行わないようにすることで検索結果そのものを学習することを避け、結果として学習が安定し性能向上に貢献しているようです。
+![alt text](/images/agentic_rl/search_r1.png)
 
-- ASearcher
+search-R1の課題として、検索ターン数を大きくすると1つの学習により多くの時間を要するため、学習効率の観点からエージェントの検索ターン数を10回以下に制限する必要がありました。
+ASearcherはsearch-R1を発展させたもので、複数の検索タスクを並行処理する際に、エージェントの行動とモデルの学習を完全に分離した非同期な学習システムとすることで学習効率を改善し結果として最大128ターンという長時間の探索をエージェントに学習させることが可能になりました。
 ![alt text](/images/agentic_rl/asearcher.png)
 
-上記にような外部のウェブ検索APIを利用する方法は、ウェブのドキュメント品質がノイズとなり学習が不安定になりうること、学習に必要となるAPI利用コストが高いという2つの課題があリます。
-これを踏まえて最近の研究では、LLMの内部知識を模倣した仮想検索エンジンの利用が進められています。
-たとえばZeroSearchは、リアルなウェブ検索をLLM自体から精錬された疑似検索エンジンで置き換え、実際のクエリを発行することなくカリキュラムRLを組み合わせてリアルエンジンの性能へ段階的に近づけます。
+上記にように外部のweb検索APIを利用する方法は、webのドキュメント品質がノイズとなり学習が不安定になりうること、学習に必要となるAPI利用コストが高いという2つの課題があります。
+ZeroSearchは、外部の検索エンジンを効果的に利用する能力を学習させる点では上記の手法と同様ですが、最大の特徴は学習中に実際の検索エンジン（Googleなど）を一切使わない点にあります。search-R1の図とZeroSearchの図を比較するとエージェントの行動収集を行うRollout ModuleにおいてSearchEngineがSimulationLLMに置き換わっていることが確認できます。このように学習対象とは別のLLMを使って検索エンジンの挙動を模倣し、その模倣された環境の中でLLMの検索と推論能力を学習します。結果としてZeroSearchは実際の検索エンジンで学習させたモデルと同等あるいはそれ以上の性能を圧倒的に低いコストで達成できることを示しています。
 ![alt text](/images/agentic_rl/zero_search.png)
 
 ### コードエージェント
