@@ -1,5 +1,5 @@
 ---
-title: "LLM x 強化学習の新しいパラダイム Agentic RLの研究動向"
+title: "LLM×強化学習の新しいパラダイム：Agentic RLの研究動向"
 emoji: "🔥"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["強化学習", "LLM", "エージェント"]
@@ -7,13 +7,12 @@ published: false
 ---
 
 ## はじめに
-この記事ではLLM研究で注目を集めるエージェント型強化学習（Agentic Reinforcement Learning、Agentic RL）のサーベイ
-「The Landscape of Agentic Reinforcement Learning for LLMs: A Survey」^[[The Landscape of Agentic Reinforcement Learning for LLMs: A Survey](https://arxiv.org/abs/2509.02547)]を読み、私なりの理解と要点を整理して紹介します。500件以上の文献を引用しているかなりボリュームのあるサーベイ論文ですが、この記事ではその中から私が重要と感じたトピックをピックアップして紹介します。Agentic RLに興味がある方や、LLMに対する強化学習の最新動向を知りたい方の参考になれば幸いです。
-https://arxiv.org/abs/2509.02547
+本記事では、LLM研究で注目を集めるエージェント型強化学習（Agentic Reinforcement Learning、Agentic RL）のサーベイ論文
+「The Landscape of Agentic Reinforcement Learning for LLMs: A Survey」^[[The Landscape of Agentic Reinforcement Learning for LLMs: A Survey](https://arxiv.org/abs/2509.02547)]を読み、私なりの理解と要点を整理して紹介します。500件以上の文献を引用するボリュームのある論文ですが、ここでは重要だと感じたトピックに絞って取り上げます。Agentic RLに興味がある方や、LLMに対する強化学習の最新動向を知りたい方の参考になれば幸いです。
 
-本記事の前提事項
-- PPOやGRPOといったRLアルゴリズムに関する説明は他の多くの記事ですでにされているため、本記事での説明は省略します。
-- DeepSeek-R1^[[DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning](https://arxiv.org/abs/2501.12948)]の研究を前提として話している部分がいくつかあるため、未読の方は原著論文や解説記事の参照をおすすめします。私は以下のブログに大変お世話になりました。
+### 本記事の前提
+- PPOやGRPOといったRLアルゴリズムの解説は他の多くの記事で既に説明されているため、本記事では割愛します。
+- DeepSeek-R1^[[DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning](https://arxiv.org/abs/2501.12948)]の研究を前提とする箇所がいくつかあります。未読の方は原著論文や解説記事の参照をおすすめします。以下のブログを大いに参考にしました。
 
 https://zenn.dev/asap/articles/34237ad87f8511
 
@@ -21,18 +20,18 @@ https://horomary.hatenablog.com/entry/2025/01/26/204545
 
 
 ## LLM×強化学習の歴史
-Agentic RLの話に入る前に、まずはLLMに対してRLがどのように適用されてきたかを簡単に振り返っていきます。
+Agentic RLの話に入る前に、まずはLLMに対してRLがどのように適用されてきたかを簡単に振り返ります。
 
 ### 選好チューニング
 2022年11月のChatGPTの登場により、LLMを用いた対話システムが急速に普及しました。LLMは通常、Webから収集した大量のテキストコーパスで事前学習を行った後、人間の指示に従って応答する振る舞いを獲得するために指示チューニング（Instruction Tuning）を実施します。これは、人間が生成したプロンプトと応答ペアに基づいてモデルを教師あり学習するものです。しかし、これだけでは応答が人間の好みに沿わなかったり、倫理的に問題のある内容を生成したりする場合があります。そこでRLを用いて、モデルの応答を人間の好みにより近づける手法が研究されています。
 人間のフィードバックによる強化学習（RLHF）はその代表例で、LLMの応答に対する人間のフィードバックをもとに教師あり学習した報酬モデルを用意し、モデルの応答をその報酬モデルで評価して報酬を与え、RLを実施します。これにより、人間の好みに沿った応答を生成する能力が向上します。
-RLHFの他にも、LLMの自己生成データを用いて好ましい出力を強化するAIフィードバックによる強化学習（RLAIF）や、報酬モデルやRLの枠組みを利用せずに人間の好みを直接学習する直接選好最適化（DPO）などがあります。これらの選好チューニングを目的としたRLは、本論文では従来のRLと位置付けられています。本記事では、これらを総称してPreference-Based Reinforcement Fine-Tuning(PBRFT)と呼びます。
+RLHFの他にも、LLMの自己生成データを用いて好ましい出力を強化するAIフィードバックによる強化学習（RLAIF）や、報酬モデルやRLの枠組みを利用せずに人間の好みを直接学習する直接選好最適化（DPO）などがあります。これらの選好チューニングを目的としたRLは、本論文では従来のRLと位置付けられています。本記事では、これらを総称してPreference-Based Reinforcement Fine-Tuning（PBRFT）と呼びます。
 
 ### 推論能力の向上
-初期のLLMへのRL適用は選好チューニングが主でしたが、2024年9月にOpenAIから初の推論モデルであるOpenAI o1が発表されました。RLを利用することで長考して答えを導き出す能力を向上させたことが、システムカード^[[OpenAI o1 System Card](https://cdn.openai.com/o1-system-card-20241205.pdf)]で報告されています。このレポートでは具体的なRLの手法についての情報は公開されていませんでしたが、2025年1月に登場したDeepSeek-R1によって、価値評価モデルを不要とするGRPOというRLアルゴリズムや、答えが一意に定まる問題設定に対して検証可能な報酬（Verified Reward）を利用し報酬モデルを取り除いて学習コストを下げるなど、具体的な手法とともに、RLがLLMの推論能力と汎化能力を飛躍的に向上させることが示されました。これを機に、アライメント目的であった従来の利用方法から、LLMの能力向上を目的としたRLの適用が活発化し、この流れが本記事の主題でもあるAgentic RLへとつながっています。
+初期のLLMへのRL適用は選好チューニングが主でしたが、2024年9月にOpenAIから初の推論モデルであるOpenAI o1が発表されました。RLにより長考して答えを導く能力を高めたことが、システムカード^[[OpenAI o1 System Card](https://cdn.openai.com/o1-system-card-20241205.pdf)]で報告されています。具体的な手法は公開されていませんでしたが、2025年1月に登場したDeepSeek-R1は、価値評価モデルを不要とするGRPOというRLアルゴリズムや、答えが一意に定まる問題に対して検証可能な報酬（Verified Reward）を用い、報酬モデルを取り除いて学習コストを下げるなどの具体策とともに、RLがLLMの推論・汎化能力を飛躍的に向上させることを示しました。これを機に、従来の「アライメント目的」から「能力向上目的」へとRLの適用が広がり、この流れが本記事の主題であるAgentic RLへとつながっています。
 
 ### ツール利用性能の向上
-2025年2月に発表され、今では当たり前となっているWeb検索を使ってレポートを作成するChatGPTのDeep Researchにも、RLが適用されていることが報告されています。^[[Introducing deep research](https://openai.com/ja-JP/index/introducing-deep-research/)]
+2025年2月に発表されたChatGPTのDeep Research（Web検索を用いてレポートを作成する機能）にも、RLが適用されていると報告されています。^[[Introducing deep research](https://openai.com/ja-JP/index/introducing-deep-research/)]
 またOpenAI o1の後継であるo3モデルでは、推論能力に加えて、いつ・どのようにツールを使用するのが良いかといったツール利用性能についても、RLによって性能が向上していることが報告されています。^[[OpenAI o3 and o4-mini System Card](https://cdn.openai.com/pdf/2221c875-02dc-4789-800b-e7758f3722c1/o3-and-o4-mini-system-card.pdf)]
 このようにLLMに対するRLの適用は選好チューニングからLLMの推論能力の向上、そしてエージェントとしてのツール利用性能の向上へと広がりを見せています。これらの歴史的背景を踏まえた上で本題であるAgentic RLについて紹介します。
 
@@ -207,7 +206,7 @@ Agentic RLはさまざまなタスク領域で応用が始まっており、こ�
 ![alt text](/images/agentic_rl/domain_tree.png)
 
 ### 検索・調査エージェント
-検索・調査エージェントは、外部の知識ベースやWEB検索エンジンを活用して、ユーザーの質問や調査依頼に対して正確かつ包括的な回答を提供することを目的としています。
+検索・調査エージェントは、外部の知識ベースやWeb検索エンジンを活用して、ユーザーの質問や調査依頼に対して正確かつ包括的な回答を提供することを目的としています。
 LLMに検索能力を付与する方法としてRAGが広く用いられていますが、検索と推論を交互に行うような複雑なマルチターンタスクに対しては学習を行わないプロンプトベースの手法では限界があることから、検索クエリの生成、検索、推論をend2endで直接最適化するためにRLを利用する研究が進展しています。
 
 主要な研究の一つは、RAGの基盤を活用しつつWeb検索APIを利用して、クエリ生成と多段階の推論をRLで最適化するアプローチです。
@@ -218,7 +217,7 @@ search-R1の課題として、検索ターン数を大きくすると1つの学�
 ASearcher^[[Beyond Ten Turns: Unlocking Long-Horizon Agentic Search with Large-Scale Asynchronous RL](https://arxiv.org/abs/2508.07976)]はsearch-R1を発展させたもので、複数の検索タスクを並行処理する際に、エージェントの行動とモデルの学習を完全に分離した非同期な学習システムとすることで学習効率を改善し結果として最大128ターンという長時間の探索をエージェントに学習させることが可能になりました。
 ![alt text](/images/agentic_rl/asearcher.png)
 
-上記のように外部のWeb検索APIを利用する方法は、Web上のドキュメント品質がノイズとなり学習が不安定になりうること、学習に必要となるAPI利用コストが高いという2つの課題があります。
+上記のように外部のWeb検索APIを利用する方法は、Web上のドキュメント品質がノイズとなり学習が不安定になり得ること、学習に必要となるAPI利用コストが高いという2つの課題があります。
 ZeroSearch^[[ZEROSEARCH: Incentivize the Search Capability of LLMs without Searching](https://arxiv.org/abs/2505.04588)]は、外部の検索エンジンを効果的に利用する能力を学習させる点では上記の手法と同様ですが、最大の特徴は学習中に実際の検索エンジン（Googleなど）を一切使わない点にあります。search-R1の図とZeroSearchの図を比較するとエージェントの行動収集を行うRollout ModuleにおいてSearchEngineがSimulationLLMに置き換わっていることが確認できます。このように学習対象とは別のLLMを使って検索エンジンの挙動を模倣し、その模倣された環境の中でLLMの検索と推論能力を学習します。結果としてZeroSearchは実際の検索エンジンで学習させたモデルと同等あるいはそれ以上の性能を圧倒的に低いコストで達成できることを示しています。
 ![alt text](/images/agentic_rl/zero_search.png)
 
@@ -250,13 +249,13 @@ rStar2-Agent^[[rStar2-Agent: Agentic Reasoning Technical Report](https://arxiv.o
 ![alt text](/images/agentic_rl/1shot_rlvr.png)
 
 ### GUIエージェント
-GUIエージェントはWebブラウザ操作やアプリケーション操作といったタスクを自律的に行うエージェントです。研究初期はVision-Language Model(VLM)を用いてスクリーンショットとプロンプトを入力として単一ステップのグラフィカルユーザーインターフェース（Graphical User Interface、GUI）操作を行う方法が提案されました。その後、人間のGUI操作実績をもとに画面（状態）とGUI操作（行動）との軌跡データを用いてSFTでGUI操作を模倣学習する方法が試みられました。しかし、SFTは人間によるGUI操作記録のデータセットが乏しいという制約がありました。このような背景から、GUI操作をRLで最適化する研究が進展しています。
-UI-TARS^[[UI-TARS: Pioneering Automated GUI Interaction with Native Agents](https://arxiv.org/abs/2501.12326)]は人間のようにGUIのスクリーンショット画像情報のみからOS、WEB、モバイルアプリなど、あらゆるGUI環境で統一的に動作する高い汎用性を実現しています。エージェントを多数の仮想マシン上で実際に動作させ、新しい操作データ（軌跡）を自動で収集し、収集したデータの中から失敗した操作とそれを修正した正しい操作のペアを特定し、DPO（Direct Preference Optimization）という手法を用いて「失敗から学ぶ」ようにモデルをチューニングします。
+GUIエージェントはWebブラウザ操作やアプリケーション操作といったタスクを自律的に行うエージェントです。研究初期はVision-Language Model（VLM）を用いてスクリーンショットとプロンプトを入力として単一ステップのGUI操作を行う方法が提案されました。その後、人間のGUI操作実績をもとに画面（状態）とGUI操作（行動）との軌跡データを用いてGUI操作を模倣学習する方法が試みられました。しかし、模倣学習をするにあたり人間によるGUI操作記録のデータセットが乏しいという課題がありました。このような背景から、GUI操作をRLする研究が進展しています。
+UI-TARS^[[UI-TARS: Pioneering Automated GUI Interaction with Native Agents](https://arxiv.org/abs/2501.12326)]は、人間のようにGUIのスクリーンショット画像情報のみからOS、Web、モバイルアプリなど、あらゆるGUI環境で統一的に動作する高い汎用性を実現しています。エージェントを多数の仮想マシン上で実際に動作させ、新しい操作データ（軌跡）を自動で収集し、収集したデータの中から失敗した操作とそれを修正した正しい操作のペアを特定し、DPO（Direct Preference Optimization）という手法を用いて「失敗から学ぶ」ようにモデルをチューニングします。
 ![alt text](/images/agentic_rl/ui_tars.png)
 
 ### 身体性を持つエージェント
 身体性エージェント（Embodied Agents）は、ロボットのように物理的な環境でマルチモーダルな情報をもとに物理的な行動を実行するエージェントです。
-通常、Vision-Language Action(VLA)モデルを用いて模倣学習による事前学習を行い、事前学習済みモデルをインタラクティブなエージェントに組み込み、環境と相互作用させてRLすることで多様な実世界環境におけるモデルの汎化能力を高めます。VLAフレームワークにおけるRLは、複雑な環境での空間的推論と移動を重視するナビゲーションエージェントと、多様で動的な制約下で物理オブジェクトの精密な制御に焦点を当てるマニピュレーションエージェントの2つに大別されます。
+通常、Vision-Language Action（VLA）モデルを用いて模倣学習による事前学習を行い、事前学習済みモデルをインタラクティブなエージェントに組み込み、環境と相互作用させてRLすることで多様な実世界環境におけるモデルの汎化能力を高めます。VLAフレームワークにおけるRLは、複雑な環境での空間的推論と移動を重視するナビゲーションエージェントと、多様で動的な制約下で物理オブジェクトの精密な制御に焦点を当てるマニピュレーションエージェントの2つに大別されます。
 
 ナビゲーションエージェントにとって、計画（プランニング）が中心的な能力となります。VLAモデルの将来の行動系列を予測し最適化する能力を強化するためにRLが用いられます。一般的な戦略は、事前学習済みのVLAモデルと同じように1ステップごとの移動行動に対して報酬を与えてエージェントを訓練することです。
 VLN-R1^[[VLN-R1: Vision-Language Navigation via Reinforcement Fine-Tuning](https://arxiv.org/abs/2506.17221)]は、RGBのビデオ映像を入力として、前進する、回転するといった離散行動を出力するモデルをSFTとRLで学習しています。モデルは一度に6ステップ分の行動軌跡を出力し、時間減衰報酬と呼ばれる、より直前の行動に高い報酬を与えるという独自の報酬設計を利用しています。
