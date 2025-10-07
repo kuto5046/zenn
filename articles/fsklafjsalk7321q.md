@@ -8,11 +8,10 @@ published: false
 
 ## はじめに
 この記事ではLLM研究で注目を集めるAgentic Reinforcement Learning（Agentic RL）のサーベイ
-「The Landscape of Agentic Reinforcement Learning for LLMs: A Survey」^[[The Landscape of Agentic Reinforcement Learning for LLMs: A Survey](https://arxiv.org/abs/2509.02547)]を読み、私なりの理解と要点を整理して紹介します。
+「The Landscape of Agentic Reinforcement Learning for LLMs: A Survey」^[[The Landscape of Agentic Reinforcement Learning for LLMs: A Survey](https://arxiv.org/abs/2509.02547)]を読み、私なりの理解と要点を整理して紹介します。500件以上の文献を引用しているかなりボリュームのあるサーベイ論文ですが、この記事ではその中から私が重要と感じたトピックをピックアップして紹介します。Agentic RLに興味がある方や、LLMに対する強化学習の最新動向を知りたい方の参考になれば幸いです。
 https://arxiv.org/abs/2509.02547
 
 この記事の前提事項
-- 各トピックにおいて私が重要と感じたり面白いなと思ったものをピックアップして紹介していきます。
 - PPO、GRPOといったRLアルゴリズムに関する説明は他の多くの記事ですでにされているため、本記事での説明は省略します。
 - DeepSeek-R1^[[DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning](https://arxiv.org/abs/2501.12948)]の研究を前提として話している部分がいくつかあるため、未読の方は原著論文や解説記事の参照をおすすめします。私は以下のブログに大変お世話になりました。
 
@@ -208,7 +207,7 @@ Agentic RLはさまざまなタスク領域で応用が始まっており、こ�
 ![alt text](/images/agentic_rl/domain_tree.png)
 
 ### 検索・調査エージェント
-検索・調査エージェントは、外部の知識ベースやウェブ検索エンジンを活用して、ユーザーの質問や調査依頼に対して正確かつ包括的な回答を提供することを目的としています。
+検索・調査エージェントは、外部の知識ベースやWEB検索エンジンを活用して、ユーザーの質問や調査依頼に対して正確かつ包括的な回答を提供することを目的としています。
 LLMに検索能力を付与する方法としてRAGが広く用いられていますが、検索と推論を交互に行うような複雑なマルチターンタスクに対しては学習を行わないプロンプトベースの手法では限界があることから、検索クエリの生成、検索、推論をend2endで直接最適化するためにRLを利用する研究が進展しています。
 
 主要な研究の一つは、RAGの基盤を活用しつつWeb検索APIを利用して、クエリ生成と多段階の推論をRLで最適化するアプローチです。
@@ -254,7 +253,7 @@ rStar2-Agent^[[rStar2-Agent: Agentic Reasoning Technical Report](https://arxiv.o
 
 ### GUIエージェント
 GUIエージェントはWebブラウザ操作やアプリケーション操作といったタスクを自律的に行うエージェントです。研究初期はVLM（Vision-Language Model）を用いてスクリーンショットとプロンプトを入力として単一ステップのGUI操作を行う方法が提案されました。その後、人間のGUI操作実績をもとに画面（状態）とGUI操作（行動）との軌跡データを用いてSFTでGUI操作を模倣学習する方法が試みられました。しかし、SFTは人間によるGUI操作記録のデータセットが乏しいという制約がありました。このような背景から、GUI操作をRLで最適化する研究が進展しています。
-UI-TARS^[[UI-TARS: Pioneering Automated GUI Interaction with Native Agents](https://arxiv.org/abs/2501.12326)]は人間のようにGUIのスクリーンショット画像情報のみからOS、ウェブ、モバイルアプリなど、あらゆるGUI環境で統一的に動作する高い汎用性を実現しています。エージェントを多数の仮想マシン上で実際に動作させ、新しい操作データ（軌跡）を自動で収集し、収集したデータの中から失敗した操作とそれを修正した正しい操作のペアを特定し、DPO（Direct Preference Optimization）という手法を用いて「失敗から学ぶ」ようにモデルをチューニングします。
+UI-TARS^[[UI-TARS: Pioneering Automated GUI Interaction with Native Agents](https://arxiv.org/abs/2501.12326)]は人間のようにGUIのスクリーンショット画像情報のみからOS、WEB、モバイルアプリなど、あらゆるGUI環境で統一的に動作する高い汎用性を実現しています。エージェントを多数の仮想マシン上で実際に動作させ、新しい操作データ（軌跡）を自動で収集し、収集したデータの中から失敗した操作とそれを修正した正しい操作のペアを特定し、DPO（Direct Preference Optimization）という手法を用いて「失敗から学ぶ」ようにモデルをチューニングします。
 ![alt text](/images/agentic_rl/ui_tars.png)
 
 ### 身体性を持つエージェント
