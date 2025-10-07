@@ -37,7 +37,7 @@ RLHFの他にも、LLMの自己生成データを用いて好ましい出力を�
 
 ## Agentic RLとは
 まずは本論文におけるAgentic RLの定義を引用します。
-![alt text](/images/agentic_rl/agentic_rl_define.png)
+![](/images/agentic_rl/agentic_rl_define.png)
 >Agentic RLとは、LLMを、単発の出力整合性やベンチマーク性能の最適化を目的とした静的な条件付き生成モデルとして扱うのではなく、逐次的な意思決定ループの中に埋め込まれた「学習可能な方策」として捉えるパラダイムを指します。この枠組みでは、RLによってモデルに計画立案・推論・ツール利用・記憶保持・自己省察などの自律的なエージェント的能力を与えることで、部分的に観測可能で動的な環境において、長期的な認知的・対話的行動が自発的に現れることを可能にします。
 
 従来のPBRFTでは、与えられたプロンプトを状態、LLMの応答を行動とみなし、この1ステップのやり取りに対して発生する報酬を最大化する問題として定式化されています。このような設定では環境との反復的な対話や状態の変化はありません。
@@ -46,7 +46,7 @@ RLHFの他にも、LLMの自己生成データを用いて好ましい出力を�
 ## PBRFTとAgentic RLの比較
 RLはマルコフ決定過程というフレームワークに基づいて定式化されるため、その観点で従来のRLとして位置付けられているPBRFTとAgentic RLの両者を比較したものが以下の表です。
 
-![alt text](/images/agentic_rl/mdp_table.png)
+![](/images/agentic_rl/mdp_table.png)
 
 
 ### 状態 (State)
@@ -68,7 +68,7 @@ GUIを操作するエージェントの場合、テキスト生成は人間や�
 
 どちらのアプローチもLLMの性能を向上させるためにRLを活用しますが、その根底にある仮定、タスク構造、および意思決定の粒度において根本的に異なります。下の図はPBRFTからAgentic RLへの各要素でのパラダイムシフトを示しています。
 
-![alt text](/images/agentic_rl/paradigm_shift.png)
+![](/images/agentic_rl/paradigm_shift.png)
 
 
 ## エージェントのコア能力とRLによる最適化
@@ -81,7 +81,7 @@ Agentic RLにおいて鍵となるのは、LLMエージェントにどのよう�
 - Self-Improvement（自己改善）
 - Perception（知覚）
 
-![alt text](/images/agentic_rl/six_aspect.png)
+![](/images/agentic_rl/six_aspect.png)
 
 ---
 
@@ -99,7 +99,8 @@ Qwen3^[[Qwen3 Technical Report](https://arxiv.org/abs/2505.09388)]は複雑な�
 ユーザーからの /think や /no_think といった指示に応じて、2つのモードを適切に切り替える能力をSFTで教え込む
 - stage4. General RL 
 一般的なタスク（指示追従、フォーマット遵守、エージェント能力など）に対して、ユーザーの好みに合うようにモデルの応答を調整する
-![alt text](/images/agentic_rl/qwen3.png)
+![](/images/agentic_rl/qwen3.png)
+*Qwen3 Technical Report (https://arxiv.org/abs/2505.09388)*
 
 ---
 
@@ -113,12 +114,14 @@ Qwen3^[[Qwen3 Technical Report](https://arxiv.org/abs/2505.09388)]は複雑な�
 #### ツール統合型RL (Tool-Integrated RL)
 次の段階では、ツール使用をLLMの認知ループに深く組み込み、複数ターンにわたってツールを使いこなすエージェントシステムが登場しました。ここではRLが導入され、どの局面でツールを呼ぶか、得た情報をどう活用するかを報酬に基づき学習します。
 例えばReTool^[[ReTool: Reinforcement Learning for Strategic Tool Use in LLMs](https://arxiv.org/abs/2504.11536)]では複雑な数学的問題タスクに対してDeepSeek-R1のようにテキストベースのRLを行うのではなく、Pythonのコードインタプリタをツールとして活用する能力をRLによって学習することで正解率を向上させています。この研究ではSFTで基本的なツール利用能力を学習後にRLで最終的な回答に対する正解報酬によってツール利用戦略を学習しました。
-![alt text](/images/agentic_rl/retool.png)
+![](/images/agentic_rl/retool.png)
+*ReTool: Reinforcement Learning for Strategic Tool Use in LLMs (https://arxiv.org/abs/2504.11536)*
 
 ほぼ同時期に発表されたARTIST^[[Agentic Reasoning and Tool Integration for LLMs via Reinforcement Learning](https://arxiv.org/abs/2505.01441)]も似たようなアプローチをとっていますが、ARTISTは数学的タスクだけでなく、BFCL v3やτ-benchといったマルチステップのFunction Callingが必要となるベンチマークでの評価を行っています。
 BFCL v3は、旅行予約や車両制御など多様な分野で、エージェントがツールを使いこなす能力を測るベンチマークです。特に、情報が不足していたり、そもそも実行不可能な要求をされたり、会話が長くて複雑だったりする困難な状況への対応力が試されます。
 τ-benchは、航空や小売の分野で、ユーザーとの現実的な会話をシミュレートするベンチマークです。エージェントは、定められたルールに従ってドメイン固有のAPIを使い、最終的に予約情報といったシステムの状態を目標どおりに更新するタスクの完遂能力を試されます。これらのタスクに対して推論・ツール利用を繰り返し行いながらタスクに対する最終的な回答を生成し、最終回答の正解報酬に加えて、ツール呼び出し成功報酬によって、いつどのツールを使うのが良いかをRLで学習しています。
-![alt text](/images/agentic_rl/artist.png)
+![](/images/agentic_rl/artist.png)
+*Agentic Reasoning and Tool Integration for LLMs via Reinforcement Learning (https://arxiv.org/abs/2505.01441)*
 
 上記で示したようなRLを利用したツール統合型推論は、研究領域だけでなくChatGPTのDeep ResearchやOpenAI o3のような商用システムにも、すでに採用されています。
 
@@ -126,7 +129,8 @@ BFCL v3は、旅行予約や車両制御など多様な分野で、エージェ�
 今後の研究の方向性として、長期的なステップでのツール連携や、複数のツールの組み合わせによる複雑なタスク解決が挙げられています。
 
 DeepSeekが発表したGRPOは、数学の問題のような1問1答型のタスクに対して有効なRLアルゴリズムですが、一連の行動すべてをまとめて評価するため、マルチステップのタスクに対しては個々のステップの良し悪しを判断するのが難しいという課題があります。GiGPO^[[Group-in-Group Policy Optimization for LLM Agent Training](https://arxiv.org/abs/2505.10978)]ではこの問題に対処するために、エピソードレベルとステップレベルの2つのグループ構造でadvantage（行動の良し悪しの基準）を計算するGroup-in-Group Policy Optimization（GiGPO）という手法を採用しています。
-![alt text](/images/agentic_rl/gigpo.png)
+![](/images/agentic_rl/gigpo.png)
+*Group-in-Group Policy Optimization for LLM Agent Training (https://arxiv.org/abs/2505.10978)*
 
 ---
 
@@ -139,16 +143,19 @@ RAG形式の検索メカニズムをRLで最適化するアプローチとして
 3. 引用された記憶には正の報酬（+1）、されなかった記憶には負の報酬（-1）を与えてRerankerのパラメータを更新する
 
 この一連の処理をオンラインRLにより、対話を通じて「LLMが本当に必要とする記憶」をより的確に選択できるようRerankerを継続的に学習しています。
-![alt text](/images/agentic_rl/prospect.png)
+![](/images/agentic_rl/prospect.png)
+*In Prospect and Retrospect: Reflective Memory Management for Long-term Personalized Dialogue Agents (https://arxiv.org/abs/2503.08026)*
 
 上記はRAGの検索メカニズムの改善にRLを利用した例でしたが、Memory-R1^[[Memory-R1: Enhancing Large Language Model Agents to Manage and Utilize Memories via Reinforcement Learning](https://arxiv.org/abs/2508.19828)]はエージェントが外部メモリを管理するためにもRLを利用します。Memory-R1は「Memory Manager」と「Answer Agent」という2つのエージェントを導入しています。Memory Managerは、メモリのエントリを「追加（ADD）」「更新（UPDATE）」「削除（DELETE）」「何もしない（NOOP）」といったメモリ操作を学習し、Answer Agentは、取得したメモリの中から最も関連性の高いものを選択して回答を生成します。両エージェントの学習にはRLが用いられていますが特に注目すべきはMemory Managerの学習方法です。Memory Managerは自身の行動そのものに対しての報酬は与えられず、Answer Agentが正しい回答を生成できたか？という最終的なアウトカムに対して報酬が与えられ最適なメモリ操作戦略を学習します。自身の行動が他のエージェントの行動に影響を与えてその結果に基づき学習が行われるというのはRLならではで面白い研究だなと思いました。
-![alt text](/images/agentic_rl/memory_r1.png)
+![](/images/agentic_rl/memory_r1.png)
+*Memory-R1: Enhancing Large Language Model Agents to Manage and Utilize Memories via Reinforcement Learning (https://arxiv.org/abs/2508.19828)*
 
 
 #### Token-levelメモリ
 こちらはRAGのように外部メモリを利用せず、LLM自身が学習可能なメモリを備えるアプローチです。
 MemAgent^[[MemAgent: Reshaping Long-Context LLM with Multi-Conv RL-based Memory Agent](https://arxiv.org/abs/2507.02259)]はLLMが非常に長いテキスト（数百万トークン）を扱えるようにすることを目的としています。人間が長い文章を読む際にメモを取るように、MemAgentはテキストをチャンクに分割して順に読み込み、固定長の「メモリ」に必要な情報を書き込みながら内容を理解していきます。このメモリ管理(限られたコンテキスト長に何を記憶させるか)を最終的なタスクの成功報酬に基づきRLで最適化します。MemAgentの仕組み自体も有用ですが、RLありMemAgentがRLなしMemAgentよりも性能が向上する結果となっておりRLの有用性が示されています。
-![alt text](/images/agentic_rl/memagent.png)
+![](/images/agentic_rl/memagent.png)
+*MemAgent: Reshaping Long-Context LLM with Multi-Conv RL-based Memory Agent (https://arxiv.org/abs/2507.02259)*
 
 --- 
 
@@ -156,7 +163,8 @@ MemAgent^[[MemAgent: Reshaping Long-Context LLM with Multi-Conv RL-based Memory 
 プランニングとは、ゴールを達成するための行動系列を計画する能力のことです。人間の問題解決でも核心となるスキルであり、LLMエージェントにとっても **「いつ・何を・どの順序で行うか」** を決定する重要な役割を果たします。初期のLLMエージェントでは、与えられたタスクをいきなり解答させるのではなく、例えばReActのようにLLM自身にCoTと行動候補を逐次生成させるプロンプト手法が試みられました。しかしプロンプト工夫やFew-shot例に基づくこれらの静的プランニングでは、新しい状況への適応や試行錯誤による戦略改善は困難でした。 RLはこの問題に対し、プランニング戦略を経験から学習させるというアプローチを提供します。
 RAP^[[Reasoning with Language Model is Planning with World Model](https://arxiv.org/abs/2305.14992)]ではモンテカルロ木探索（Monte Carlo Tree Search、MCTS）による探索を通じてCoT以上のプランニングを実現しています。従来のCoTは直線的な思考過程を生成していましたが、RAPはLLMを世界モデルとして扱い、MCTSを用いてツリーベースの思考過程（状態）を生成し、報酬が最も高くなるような推論過程のパスを先読み探索により選択することで、推論時間は増えるものの、より堅牢なプランニングを実現しています。各推論ステップの報酬（評価値）には、行動の尤もらしさ、状態の信頼度、自己評価、ゴールまでの近さのような複数の指標が採用されています。こちらはファインチューニングを行わないためRLを用いているわけではありませんが、興味深いので紹介しておきます。
 
-![alt text](/images/agentic_rl/rap.png)
+![](/images/agentic_rl/rap.png)
+*Reasoning with Language Model is Planning with World Model (https://arxiv.org/abs/2305.14992)*
 
 ---
 
@@ -165,14 +173,17 @@ RAP^[[Reasoning with Language Model is Planning with World Model](https://arxiv.
 
 KnownSelf^[[Agentic Knowledgeable Self-awareness](https://arxiv.org/abs/2504.03553)]は、エージェントがタスクを実行する際、現在の状況を自ら振り返り「このタスクは簡単だからすぐできる（Fast thinking）」「少し難しいから、一度立ち止まって考え直そう（Slow thinking）」「自分の能力では無理だから、外部の知識を使おう（Knowledgeable thinking）」といったように、自身の状態に応じて思考プロセスや知識の利用を自律的に切り替えることを可能にします。
 具体的には、エージェントが生成した行動を3つの思考パターンにルールベースで分類してSFTで学習後、2つの応答ペアのデータセットを用意し、DPOによる選好チューニングを行います。このプロセスによって、ALFWorldという家庭内でエージェントが物体を操作するタスクやWebShopというWebサイトで指示どおり商品を購入するタスクで性能向上を示しています。
-![alt text](/images/agentic_rl/knownself.png)
+![](/images/agentic_rl/knownself.png)
+*Agentic Knowledgeable Self-awareness (https://arxiv.org/abs/2504.03553)*
 
 自己反省とは少し方向性が変わりますが、人間の介入なしでエージェント自身で学習を行う自己改善の研究も進展しています。
 Absolute Zero^[[Absolute Zero: Reinforced Self-play Reasoning with Zero Data](https://arxiv.org/abs/2505.03335)]は人間が作成したタスクやラベルを一切使用せずLLMが自律的に自己改善を行うフレームワークです。このフレームワークではLLMが問題の提案を行うProposerと問題の解決を行うSolverの2つの役割を担います。SolverではProposerが生成した問題に正答した場合にのみ報酬1を得ます。一方、Proposerは$r_{proposer} = 1-r_{solver}$のようにSolverの報酬を小さくするような問題を提案する場合に高い報酬が与えられます。ただし問題が難しすぎたり簡単すぎると自己改善が進まないことから$r_{solver}$が0 or 1の場合はProposerの報酬も0になるような報酬設計となっています。なんとなくGAN(Generative Adversarial Network)に似た構造を感じます。
-![alt text](/images/agentic_rl/absolute_zero.png)
+![](/images/agentic_rl/absolute_zero.png)
+*Absolute Zero: Reinforced Self-play Reasoning with Zero Data (https://arxiv.org/abs/2505.03335)*
 
 TTRL^[[TTRL: Test-Time Reinforcement Learning](https://arxiv.org/abs/2504.16084)]は正解ラベルのないデータを使って推論時（テスト時）に自己進化による性能向上を図るものです。具体的には、LLM自身が生成した複数の回答の中から多数決で最大投票の予測を正解とみなして擬似正解データを作成し、擬似正解ラベルと予測が一致しているかを報酬としてRLを行うことで、人間のラベリングなしにモデルの推論能力を向上させています。これだけ見ると、単に選ばれやすい回答をより選ばれやすくなる（つまり確率分布を尖らせる）ようにファインチューニングしているだけのようにも思えますが、実験では数学のある特定のタスクでTTRLしたモデルで、異なる数学タスクに対しても性能が向上することが示されており、汎化性能の向上が確認されたようです。
-![alt text](/images/agentic_rl/ttrl.png)
+![](/images/agentic_rl/ttrl.png)
+*TTRL: Test-Time Reinforcement Learning (https://arxiv.org/abs/2504.16084)*
 
 --- 
 
@@ -182,16 +193,19 @@ TTRL^[[TTRL: Test-Time Reinforcement Learning](https://arxiv.org/abs/2504.16084)
 Vision-R1^[[Vision-R1: Incentivizing Reasoning Capability in Multimodal Large Language Models](https://arxiv.org/abs/2503.06749)]は、画像とテキストを同時に理解するマルチモーダル大規模言語モデル（Multimodal Large Language Model、MLLM）を用いて、特に数学の図形問題のような複雑な視覚的推論タスクにおいて人間のような深い思考プロセスを再現することを目指しています。DeepSeek-R1のようにRLを用いて数学問題に対する推論能力を向上させるアプローチですが、単純にRLを適用するのではなく、「DeepSeek-R1の模倣学習」と「段階的思考抑制トレーニング（PTST）」という2段階の学習を組み合わせているのが特徴です。
  - 1段階目: MLLMを用いて視覚情報を詳細なテキスト記述に変換させるModality Bridgingを実施し、そのテキストをDeepSeek-R1に渡すことで詳細なCoTを出力させます。DeepSeek-R1のCoTを正解ラベルとしてMLLMを教師ありファインチューニング（Supervised Fine-Tuning、SFT）することで、視覚情報に基づくCoTを安定的に生成できるようにします。
  - 2段階目: 1段階目終了時点ではCoTが長くなると性能が低下する傾向があることから、2段階目では思考の長さを制限し段階的に増やしながら、RLで視覚情報を含めた推論能力向上を行うPTSTを実施します。
-![alt text](/images/agentic_rl/vision_r1.png)
+![](/images/agentic_rl/vision_r1.png)
+*Vision-R1: Incentivizing Reasoning Capability in Multimodal Large Language Models (https://arxiv.org/abs/2503.06749)*
 
 OPENTHINKIMG^[[OPENTHINKIMG: Learning to Think with Images via Visual Tool Reinforcement Learning](https://arxiv.org/abs/2505.08617)]は、視覚ツールを使って視覚的問題を解くための学習にRLを利用しています。
 具体的には、画像とテキストをVLMに入力し、グラフの数値を読み取るOCRツール、画像の一部を拡大するズームツールといった視覚的なツールをVLMが操作しながら視覚的問題を解きます。
 モデルは環境内でツールを自由に使い、ツールの利用結果を視覚情報としてインプットしながら、最終的なタスクの正解・不正解という報酬を最大化するように方策を更新していきます。特に、ツールの視覚的な出力をモデルの次の判断材料として直接利用する点が重要で、これにより、モデルは自らの行動が視覚的にどのような結果をもたらすかを理解しながら、より賢いツール選択ができるようになります。
 ![alt text](/images/agentic_rl/openthinkimg.png)
+*OPENTHINKIMG: Learning to Think with Images via Visual Tool Reinforcement Learning (https://arxiv.org/abs/2505.08617)*
 
 Visual Planning^[[Visual Planning: Let’s Think Only with Images](https://arxiv.org/abs/2505.11409)]では、人間が頭の中で地図を思い浮かべたり、家具の配置をシミュレーションしたりするように、モデルが言語ではなく画像によってタスクの計画を立てることを目指しています。
 モデルは現在の画像状態から次の画像状態を複数候補生成し、前の状態と現在の状態との差分から行動（ナビゲーションの場合、上下左右の移動方向が行動に該当）をルールベースで算出します。このステップを繰り返し、ゴールに近づく場合に報酬を与えることで、ゴールまでの行動計画を画像ベースで学習します。
-![alt text](/images/agentic_rl/visual_planning.png)
+![](/images/agentic_rl/visual_planning.png)
+*Visual Planning: Let’s Think Only with Images (https://arxiv.org/abs/2505.11409)*
 
 
 ## 主な応用分野と代表的な手法
@@ -211,15 +225,18 @@ LLMに検索能力を付与する方法としてRAGが広く用いられてい�
 
 主要な研究の一つは、RAGの基盤を活用しつつWeb検索APIを利用して、クエリ生成と多段階の推論をRLで最適化するアプローチです。
 search-R1^[[Search-R1: Training LLMs to Reason and Leverage Search Engines with Reinforcement Learning](https://arxiv.org/abs/2503.09516)]は`<think>`(思考), `<search>`(検索クエリ),`<information>`(検索結果), `<answer>`(回答)という4つの特殊トークンを導入し、思考と検索を複数ターン繰り返し最終回答をするプロセスをPPOやGRPOといったRLアルゴリズムで学習します。思考、検索クエリ、回答をそれぞれ行動として扱い、最終的な回答が正解かどうかを報酬として与えることで検索と推論の両方の能力を向上させています。また`<information>`(検索結果)に対しては損失計算を行わないようにすることで検索結果そのものを学習することを避け、結果として学習が安定し性能向上に貢献しているようです。
-![alt text](/images/agentic_rl/search_r1.png)
+![](/images/agentic_rl/search_r1.png)
+*Search-R1: Training LLMs to Reason and Leverage Search Engines with Reinforcement Learning (https://arxiv.org/abs/2503.09516)*
 
 search-R1の課題として、検索ターン数を大きくすると1つの学習により多くの時間を要するため、学習効率の観点からエージェントの検索ターン数を10回以下に制限する必要がありました。
 ASearcher^[[Beyond Ten Turns: Unlocking Long-Horizon Agentic Search with Large-Scale Asynchronous RL](https://arxiv.org/abs/2508.07976)]はsearch-R1を発展させたもので、複数の検索タスクを並行処理する際に、エージェントの行動とモデルの学習を完全に分離した非同期な学習システムとすることで学習効率を改善し結果として最大128ターンという長時間の探索をエージェントに学習させることが可能になりました。
-![alt text](/images/agentic_rl/asearcher.png)
+![](/images/agentic_rl/asearcher.png)
+*Beyond Ten Turns: Unlocking Long-Horizon Agentic Search with Large-Scale Asynchronous RL (https://arxiv.org/abs/2508.07976)*
 
 上記のように外部のWeb検索APIを利用する方法は、Web上のドキュメント品質がノイズとなり学習が不安定になり得ること、学習に必要となるAPI利用コストが高いという2つの課題があります。
 ZeroSearch^[[ZEROSEARCH: Incentivize the Search Capability of LLMs without Searching](https://arxiv.org/abs/2505.04588)]は、外部の検索エンジンを効果的に利用する能力を学習させる点では上記の手法と同様ですが、最大の特徴は学習中に実際の検索エンジン（Googleなど）を一切使わない点にあります。search-R1の図とZeroSearchの図を比較するとエージェントの行動収集を行うRollout ModuleにおいてSearchEngineがSimulationLLMに置き換わっていることが確認できます。このように学習対象とは別のLLMを使って検索エンジンの挙動を模倣し、その模倣された環境の中でLLMの検索と推論能力を学習します。結果としてZeroSearchは実際の検索エンジンで学習させたモデルと同等あるいはそれ以上の性能を圧倒的に低いコストで達成できることを示しています。
-![alt text](/images/agentic_rl/zero_search.png)
+![](/images/agentic_rl/zero_search.png)
+*ZEROSEARCH: Incentivize the Search Capability of LLMs without Searching (https://arxiv.org/abs/2505.04588)*
 
 ### コードエージェント
 コードエージェントはOpenAIのCodexやAnthropicのClaude Codeのような、コーディングタスクに特化したエージェントです。本論文においてコードエージェントのタスクは、単一ターンでのコード生成、複数ターンでのコード改良、ソフトウェアエンジニアリングの自動化の3つに大別されています。この記事では、特に難易度の高いソフトウェアエンジニアリングを自律的に行うエージェントの研究を見ていきます。ソフトウェアエンジニアリングはコードの読み込み・修正・追加に加えて、外部ツール（コンパイラ、リンター、バージョン管理、シェル）の利用やテストによる結果の検証など、複雑で長期的なステップを伴うタスクです。このようなシナリオではエージェント的な能力が必要となり、RLを用いてエージェントの能力を向上させる研究が進展しています。
@@ -235,7 +252,8 @@ R(\tau) = \begin{cases}
 $$
 
 またSWE-RLはソフトウェアのバグ修正という特定のタスクのみで訓練されたにもかかわらず、その過程で獲得した推論能力が、数学、一般的なコーディング、言語理解といった全く異なるドメインのタスクにおいても性能向上をもたらすことを示しました。
-![alt text](/images/agentic_rl/swe_rl.png)
+![](/images/agentic_rl/swe_rl.png)
+*SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution (https://arxiv.org/abs/2502.18449)*
 
 - Qwen3 Coder
 
@@ -243,15 +261,18 @@ $$
 ### 数学エージェント
 数学的推論は、その記号的な抽象性、論理的な一貫性、そして長期にわたる演繹が求められるという性質から、LLMエージェントの推論能力を評価する上で極めて重要な基準と考えられています。エージェントのコア能力で紹介した研究でも数学的なタスクに対する性能を見ているものが数多くあります。
 rStar2-Agent^[[rStar2-Agent: Agentic Reasoning Technical Report](https://arxiv.org/abs/2508.20722)]は、難しい数学的タスクに対して、推論データによるSFTなしの純粋なAgentic RLアプローチによって、14Bパラメータで671BのDeepSeek-R1-Zeroを上回る性能と学習効率を達成しています。この研究では、ツール利用の節で紹介したReToolのようにPythonの実行環境をツールとして用いたツール統合型推論を行っている点と、複数回のロールアウトで生成した回答候補から、最終的に正解しており、かつ推論過程で利用したツール呼び出しのエラーが少ない質の高い成功例を優先的にサンプリングして学習するResample on Correct（RoC）というテクニックを導入しているのが特徴です。
-![alt text](/images/agentic_rl/rstar2.png)
+![](/images/agentic_rl/rstar2.png)
+*rStar2-Agent: Agentic Reasoning Technical Report (https://arxiv.org/abs/2508.20722)*
 
 1Shot-RLVR^[[Reinforcement Learning for Reasoning in Large Language Models with One Training Example](https://arxiv.org/abs/2504.20571)]では数学的推論能力を向上させるために、たった1つの訓練例を用いたRLが有効であったことを実証しています。具体的には、ベースモデルのQwen2.5-Math-1.5Bに対して1つの訓練例を適用するだけで、MATH500ベンチマークで36.0%から73.6%へと大幅な性能向上を達成し、6つの主要な数学的推論ベンチマークの平均で17.6%から35.7%に改善したことを示しています。これは、数千の例を含むデータセットを用いた場合と同等またはそれ以上の性能であることを示唆しており、少量のデータでLLMの推論能力を効果的に活性化できることを強調しています。
-![alt text](/images/agentic_rl/1shot_rlvr.png)
+![](/images/agentic_rl/1shot_rlvr.png)
+*Reinforcement Learning for Reasoning in Large Language Models with One Training Example (https://arxiv.org/abs/2504.20571)*
 
 ### GUIエージェント
 GUIエージェントはWebブラウザ操作やアプリケーション操作といったタスクを自律的に行うエージェントです。研究初期はVision-Language Model（VLM）を用いてスクリーンショットとプロンプトを入力として単一ステップのGUI操作を行う方法が提案されました。その後、人間のGUI操作実績をもとに画面（状態）とGUI操作（行動）との軌跡データを用いてGUI操作を模倣学習する方法が試みられました。しかし、模倣学習をするにあたり人間によるGUI操作記録のデータセットが乏しいという課題がありました。このような背景から、GUI操作をRLする研究が進展しています。
 UI-TARS^[[UI-TARS: Pioneering Automated GUI Interaction with Native Agents](https://arxiv.org/abs/2501.12326)]は、人間のようにGUIのスクリーンショット画像情報のみからOS、Web、モバイルアプリなど、あらゆるGUI環境で統一的に動作する高い汎用性を実現しています。エージェントを多数の仮想マシン上で実際に動作させ、新しい操作データ（軌跡）を自動で収集し、収集したデータの中から失敗した操作とそれを修正した正しい操作のペアを特定し、DPO（Direct Preference Optimization）という手法を用いて「失敗から学ぶ」ようにモデルをチューニングします。
-![alt text](/images/agentic_rl/ui_tars.png)
+![](/images/agentic_rl/ui_tars.png)
+*UI-TARS: Pioneering Automated GUI Interaction with Native Agents (https://arxiv.org/abs/2501.12326)*
 
 ### 身体性を持つエージェント
 身体性エージェント（Embodied Agents）は、ロボットのように物理的な環境でマルチモーダルな情報をもとに物理的な行動を実行するエージェントです。
@@ -259,10 +280,12 @@ UI-TARS^[[UI-TARS: Pioneering Automated GUI Interaction with Native Agents](http
 
 ナビゲーションエージェントにとって、計画（プランニング）が中心的な能力となります。VLAモデルの将来の行動系列を予測し最適化する能力を強化するためにRLが用いられます。一般的な戦略は、事前学習済みのVLAモデルと同じように1ステップごとの移動行動に対して報酬を与えてエージェントを訓練することです。
 VLN-R1^[[VLN-R1: Vision-Language Navigation via Reinforcement Fine-Tuning](https://arxiv.org/abs/2506.17221)]は、RGBのビデオ映像を入力として、前進する、回転するといった離散行動を出力するモデルをSFTとRLで学習しています。モデルは一度に6ステップ分の行動軌跡を出力し、時間減衰報酬と呼ばれる、より直前の行動に高い報酬を与えるという独自の報酬設計を利用しています。
-![alt text](/images/agentic_rl/vln_r1.png)
+![](/images/agentic_rl/vln_r1.png)
+*VLN-R1: Vision-Language Navigation via Reinforcement Fine-Tuning (https://arxiv.org/abs/2506.17221)*
 
 マニピュレーションエージェントは主にロボットアームが関わるタスクで利用されます。RLはVLAモデルの指示追従能力と軌跡予測能力を強化するために、特にタスクや環境を越えた汎化性能を向上させる目的で用いられます。
 VLA-RL^[[VLA-RL: Towards Masterful and General Robotic Manipulation with Scalable Reinforcement Learning](https://arxiv.org/abs/2505.18719)]はロボットの一連の動作生成を人間とAIの対話のように捉え直しています。各タイムステップで、ロボットは「現在の視覚情報（画像）」と「人間からの指示（テキスト）」を入力として受け取り、次に行うべき行動を言語トークンとして出力します。これにより強力な言語モデルの構造をRLに直接応用することが可能になっています。
-![alt text](/images/agentic_rl/vla_rl.png)
+![](/images/agentic_rl/vla_rl.png)
+*VLA-RL: Towards Masterful and General Robotic Manipulation with Scalable Reinforcement Learning (https://arxiv.org/abs/2505.18719)*
 
 ## おわりに
