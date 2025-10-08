@@ -3,7 +3,7 @@ title: "LLM×強化学習の新しいパラダイム: Agentic RLの研究紹介"
 emoji: "🔥"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["強化学習", "LLM", "エージェント"]
-published: false
+published: true
 ---
 
 ## はじめに
@@ -89,7 +89,7 @@ Agentic RLにおいて鍵となるのは、LLMエージェントにどのよう�
 ---
 
 ### 推論（Reasoning）
-推論（Reasoning）は、与えられた情報から論理的に結論を導くプロセスです。従来のLLMにおいてもChain-of-Thought(CoT）プロンプティングなどの技術によって推論する能力を持ちますが、最近はRLを用いてLLMの推論能力を向上させる研究が進展しています。その流れを決定的に加速させたのがDeepSeek-R1です。価値関数モデルを不要とするGRPOの採用や、一意解タスクに対するルールベース報酬による効率化など、具体的なアプローチを通じて推論強化の効果を広く知らしめました。ただし実装はクローズドなままだったため、再現性のある比較検証や発展的な研究を進める上でのハードルが残っていました。そこで登場したのがDAPO^[[DAPO: An Open-Source LLM Reinforcement Learning System at Scale](https://arxiv.org/abs/2503.14476)]です。DeepSeek-R1と肩を並べる性能を半分の学習ステップで達成しつつ、アルゴリズム・コード・データセット一式を完全オープンソース化し、推論モデルのRL研究を実装レベルで再現・拡張できる環境を提供した点が大きな貢献と言えます。
+推論（Reasoning）は、与えられた情報から論理的に結論を導くプロセスです。従来のLLMにおいてもChain-of-Thought(CoT)プロンプティングなどの技術によって推論する能力を持ちますが、最近はRLを用いてLLMの推論能力を向上させる研究が進展しています。その流れを決定的に加速させたのがDeepSeek-R1です。価値関数モデルを不要とするGRPOの採用や、一意解タスクに対するルールベース報酬による効率化など、具体的なアプローチを通じて推論強化の効果を広く知らしめました。ただし実装はクローズドなままだったため、再現性のある比較検証や発展的な研究を進める上でのハードルが残っていました。そこで登場したのがDAPO^[[DAPO: An Open-Source LLM Reinforcement Learning System at Scale](https://arxiv.org/abs/2503.14476)]です。DeepSeek-R1と肩を並べる性能を半分の学習ステップで達成しつつ、アルゴリズム・コード・データセット一式を完全オープンソース化し、推論モデルのRL研究を実装レベルで再現・拡張できる環境を提供した点が大きな貢献と言えます。
 
 推論モデルの研究は推論能力のさらなる向上という方向性のほかに、考えすぎ（overthinking）の問題への対処も求められています。これは必要以上に長く考えすぎることでユーザへの応答に時間を要してしまう問題や長考することで逆に精度が悪化する問題につながります。
 Qwen3^[[Qwen3 Technical Report](https://arxiv.org/abs/2505.09388)]は複雑な多段階推論を行うための「思考モード（thinking mode）」と、迅速な応答のための「非思考モード（non-thinking mode）」を単一のモデルで実現するためにRLと教師ありファインチューニング(SFT)を組み合わせて以下の4stage学習を行っています。面白いのは、thinking modeの学習によってthinking budget(思考予算)と呼ばれるユーザーが推論に割り当てる計算リソースをトークン数で指定できる仕組みを自然に獲得している点です。
@@ -98,6 +98,13 @@ Qwen3^[[Qwen3 Technical Report](https://arxiv.org/abs/2505.09388)]は複雑な�
 - stage2. Reasoning RL: 高度で複雑な推論タスク（数学やコーディングなど）性能をRLで改善する
 - stage3. Thinking Mode Fusion (SFT): ユーザーからの /think や /no_think といった指示追従をSFTで学習する
 - stage4. General RL: 一般的なタスク（指示追従、フォーマット遵守、エージェント能力など）に対して、ユーザーの好みに合うようにモデルの応答を調整する
+
+またstage2のReasoning RLでは学習を安定させるために以下の基準を満たすようにデータセットを設計しています。特に2つ目と3つ目からReasoning RLにおいて難易度設定が重要そうな印象を受けます。
+- コールドスタート段階で使用されていないこと
+- コールドスタートモデルにとって学習可能であること
+- 可能な限り挑戦的であること
+- 広範なサブドメインをカバーしていること
+
 ![](/images/agentic_rl/qwen3.png)
 *Qwen3 Technical Report (https://arxiv.org/abs/2505.09388)*
 
@@ -238,7 +245,8 @@ ZeroSearch^[[ZEROSEARCH: Incentivize the Search Capability of LLMs without Searc
 *ZEROSEARCH: Incentivize the Search Capability of LLMs without Searching (https://arxiv.org/abs/2505.04588)*
 
 ### コードエージェント
-コードエージェントはOpenAIのCodexやAnthropicのClaude Codeのような、コーディングタスクに特化したエージェントです。本論文においてコードエージェントのタスクは、単一ターンでのコード生成、複数ターンでのコード改良、ソフトウェアエンジニアリングの自動化の3つに大別されています。この記事では、特に難易度の高いソフトウェアエンジニアリングを自律的に行うエージェントの研究を見ていきます。ソフトウェアエンジニアリングはコードの読み込み・修正・追加に加えて、外部ツール（コンパイラ、リンター、バージョン管理、シェル）の利用やテストによる結果の検証など、複雑で長期的なステップを伴うタスクです。このようなシナリオではエージェント的な能力が必要となり、RLを用いてエージェントの能力を向上させる研究が進展しています。
+コードエージェントはOpenAIのCodexやAnthropicのClaude Codeのような、コーディングタスクに特化したエージェントです。本論文においてコードエージェントのタスクは、単一ターンでのコード生成、複数ターンでのコード改良、ソフトウェアエンジニアリングの自動化の3つに大別されています。この記事では、特に難易度の高いソフトウェアエンジニアリングを自律的に行うエージェントの研究を見ていきます。
+ソフトウェアエンジニアリングはコードの読み込み・修正・追加に加えて、外部ツール（コンパイラ、リンター、バージョン管理、シェル）の利用やテストによる結果の検証など、複雑で長期的なステップを伴うタスクです。このようなシナリオではエージェント的な能力が必要となり、RLを用いてエージェントの能力を向上させる研究が進展しています。
 
 SWE-RL^[[SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution](https://arxiv.org/abs/2502.18449)]では、GitHubの460万件の公開レポジトリを対象に、イシュー、プルリクエスト、レビューコメントを時系列で収集してRL用の学習データセットを構築しています。
 本研究の重要な点は、複雑なシミュレーターや実行環境を必要とせず、エージェントが生成した修正コード $\text{patch}_{\text{pred}}$ と人間が書いた正解のコード $\text{patch}_{\text{gt}}$ を、Pythonの`difflib.SequenceMatcher`という文字列の差分から類似度を計算するクラスを使って報酬を計算している点です。これにより、膨大なデータに対して軽量かつスケーラブルなRLが可能となっています。
@@ -254,6 +262,10 @@ $$
 ![](/images/agentic_rl/swe_rl.png)
 *SWE-RL: Advancing LLM Reasoning via Reinforcement Learning on Open Software Evolution (https://arxiv.org/abs/2502.18449)*
 
+SWE-RLがコード実行環境を必要としないのに対し、実際にコードを実行する環境を利用してRLを行う研究もあります。
+Qwen3 Coder^[[Qwen3-Coder: Agentic Coding in the World](https://qwen.ai/blog?id=d927d7d2e59d059045ce758ded34f98c0186d2d7&from=research.research-list)]はコード実行環境を用意しテスト結果やエラー情報などのような検証可能な報酬を利用してコーディング能力向上のためのRLを行なっています。コード実行環境についてもアリババクラウドを活用し2万個の独立した環境を並列実行可能となるようにシステムを構築することで大規模な強化学習を実現しています。結果としてソフトウェアエンジニアリングタスクを扱うSWE-Bench Verifiedにおいてオープンソースモデル中で最高水準の性能を達成しています。
+![](/images/agentic_rl/qwen3_coder.png)
+*Qwen3-Coder: Agentic Coding in the World (https://qwen.ai/blog?id=d927d7d2e59d059045ce758ded34f98c0186d2d7&from=research.research-list*
 
 ### 数学エージェント
 数学的推論は、その記号的な抽象性、論理的な一貫性、そして長期にわたる演繹が求められるという性質から、LLMエージェントの推論能力を評価する上で極めて重要な基準と考えられています。エージェントのコア能力で紹介した研究でも数学的なタスクに対する性能を見ているものが数多くあります。
