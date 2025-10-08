@@ -99,14 +99,14 @@ Qwen3^[[Qwen3 Technical Report](https://arxiv.org/abs/2505.09388)]は複雑な�
 - stage3. Thinking Mode Fusion (SFT): ユーザーからの /think や /no_think といった指示追従をSFTで学習する
 - stage4. General RL: 一般的なタスク（指示追従、フォーマット遵守、エージェント能力など）に対して、ユーザーの好みに合うようにモデルの応答を調整する
 
+![](/images/agentic_rl/qwen3.png)
+*Qwen3 Technical Report (https://arxiv.org/abs/2505.09388)*
+
 またstage2のReasoning RLでは学習を安定させるために以下の基準を満たすようにデータセットを設計しています。特に2つ目と3つ目からReasoning RLにおいて難易度設定が重要そうな印象を受けます。
 - コールドスタート段階で使用されていないこと
 - コールドスタートモデルにとって学習可能であること
 - 可能な限り挑戦的であること
 - 広範なサブドメインをカバーしていること
-
-![](/images/agentic_rl/qwen3.png)
-*Qwen3 Technical Report (https://arxiv.org/abs/2505.09388)*
 
 ---
 
@@ -115,26 +115,25 @@ Qwen3^[[Qwen3 Technical Report](https://arxiv.org/abs/2505.09388)]は複雑な�
 ツール使用は、エージェントが外部の情報源やAPI、計算資源などを呼び出して活用する能力です。検索エンジンでの情報取得や電卓・コード実行、他のモデルへのクエリなど、タスク達成に必要なあらゆる外部ツールとのインタラクションを含みます。RLによりエージェントは **「どのタイミングで、どのツールを、どう使うか」** を試行錯誤から学び取れるようになります。発展の流れは大きく3段階あります。
 ![alt text](/images/agentic_rl/tool_history.png)
 #### ReAct形式のツール利用
-エージェントのツール利用について、初期はReAct^[[ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)]と呼ばれるプロンプトベースの手法や、Toolformer^[[Toolformer: Language Models Can Teach Themselves to Use Tools](https://arxiv.org/abs/2302.04761)]と呼ばれるツール利用プロセスをSFTで模倣学習しツール利用能力を獲得する手法が試みられました。しかし、SFTはいわゆる模倣学習であるため未知のツールへの汎化が難しく、柔軟性に欠けます。また、ツール利用履歴データを用意するコストもあることから、RLを用いてアウトカムベースでツール利用戦略を学習する試みが始まりました。
+エージェントのツール利用について、初期はReAct^[[ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)]と呼ばれるプロンプトベースの手法や、Toolformer^[[Toolformer: Language Models Can Teach Themselves to Use Tools](https://arxiv.org/abs/2302.04761)]と呼ばれるツール利用プロセスをSFTで模倣学習しツール利用能力を獲得する手法が試みられました。しかし、模倣学習の場合教わっていない未知のツールへの汎化は難しく柔軟性に欠けます。また、ツール利用履歴データを用意するコストもあることから、RLを用いてアウトカムベースでツール利用戦略を学習する試みが始まりました。
 
 #### ツール統合型RL (Tool-Integrated RL)
-次の段階では、ツール使用をLLMの認知ループに深く組み込み、複数ターンにわたってツールを使いこなすエージェントシステムが登場しました。ここではRLが導入され、どの局面でツールを呼ぶか、得た情報をどう活用するかを報酬に基づき学習します。
+次の段階では、ツール使用をLLMの認知ループに深く組み込み、複数ターンにわたってツールを使いこなすエージェントシステムが登場しました。どの局面でどのツールを呼ぶか、得た情報をどう活用するかを報酬に基づきRLで学習します。
 例えばReTool^[[ReTool: Reinforcement Learning for Strategic Tool Use in LLMs](https://arxiv.org/abs/2504.11536)]では複雑な数学的問題タスクに対してDeepSeek-R1のようにテキストベースのRLを行うのではなく、Pythonのコードインタプリタをツールとして活用する能力をRLによって学習することで正解率を向上させています。この研究ではSFTで基本的なツール利用能力を学習後にRLで最終的な回答に対する正解報酬によってツール利用戦略を学習しました。
 ![](/images/agentic_rl/retool.png)
 *ReTool: Reinforcement Learning for Strategic Tool Use in LLMs (https://arxiv.org/abs/2504.11536)*
 
-ほぼ同時期に発表されたARTIST^[[Agentic Reasoning and Tool Integration for LLMs via Reinforcement Learning](https://arxiv.org/abs/2505.01441)]も似たようなアプローチをとっていますが、ARTISTは数学的タスクだけでなく、BFCL v3やτ-benchといったマルチステップのFunction Callingが必要となるベンチマークでの評価を行っています。
-BFCL v3は、旅行予約や車両制御など多様な分野で、エージェントがツールを使いこなす能力を測るベンチマークです。特に、情報が不足していたり、そもそも実行不可能な要求をされたり、会話が長くて複雑だったりする困難な状況への対応力が試されます。
-τ-benchは、航空や小売の分野で、ユーザーとの現実的な会話をシミュレートするベンチマークです。エージェントは、定められたルールに従ってドメイン固有のAPIを使い、最終的に予約情報といったシステムの状態を目標どおりに更新するタスクの完遂能力を試されます。これらのタスクに対して推論・ツール利用を繰り返し行いながらタスクに対する最終的な回答を生成し、最終回答の正解報酬に加えて、ツール呼び出し成功報酬によって、いつどのツールを使うのが良いかをRLで学習しています。
+ほぼ同時期に発表されたARTIST^[[Agentic Reasoning and Tool Integration for LLMs via Reinforcement Learning](https://arxiv.org/abs/2505.01441)]も似たようなアプローチをとっていますが、ARTISTは数学的タスクだけでなく、BFCL v3やτ-benchといったマルチステップのFunction Callingが必要となるベンチマークでの評価を行っています。これらのタスクに対して推論・ツール利用を繰り返し行いながらタスクに対する最終的な回答を生成し、最終回答の正解報酬に加えて、ツール呼び出し成功報酬によって、いつどのツールを使うのが良いかをRLで学習しています。
 ![](/images/agentic_rl/artist.png)
 *Agentic Reasoning and Tool Integration for LLMs via Reinforcement Learning (https://arxiv.org/abs/2505.01441)*
 
-上記で示したようなRLを利用したツール統合型推論は、研究領域だけでなくChatGPTのDeep ResearchやOpenAI o3のような商用システムにも、すでに採用されています。(適用方法の詳細は不明)
+上記で示したようなRLを利用したツール統合型推論は、研究領域だけでなくChatGPTのDeep ResearchやOpenAI o3のような商用システムのファインチューニングにも採用されていると言われています。(適用方法の詳細は不明)
 
 #### 長期的・マルチステップのツール使用
 今後の研究の方向性として、長期的なステップでのツール連携や、複数のツールの組み合わせによる複雑なタスク解決が挙げられています。
 
-DeepSeekが発表したGRPOは、数学の問題のような1問1答型のタスクに対して有効なRLアルゴリズムですが、一連の行動すべてをまとめて評価するため、マルチステップのタスクに対しては個々のステップの良し悪しを判断するのが難しいという課題があります。GiGPO^[[Group-in-Group Policy Optimization for LLM Agent Training](https://arxiv.org/abs/2505.10978)]ではこの問題に対処するために、エピソードレベルとステップレベルの2つのグループ構造でadvantage（行動の良し悪しの基準）を計算するGroup-in-Group Policy Optimization（GiGPO）という手法を採用しています。
+DeepSeekが発表したGRPOは、数学の問題のような1問1答型のタスクに対して有効なRLアルゴリズムですが、一連の行動すべてをまとめて評価するため、マルチステップのタスクに対しては個々のステップの良し悪しを判断するのが難しいという課題があります。
+GiGPO^[[Group-in-Group Policy Optimization for LLM Agent Training](https://arxiv.org/abs/2505.10978)]ではこの問題に対処するために、エピソードレベルとステップレベルの2つのグループ構造でadvantage（行動の良し悪しの基準）を計算するGroup-in-Group Policy Optimization（GiGPO）という手法を採用しています。
 ![](/images/agentic_rl/gigpo.png)
 *Group-in-Group Policy Optimization for LLM Agent Training (https://arxiv.org/abs/2505.10978)*
 
@@ -196,20 +195,18 @@ TTRL^[[TTRL: Test-Time Reinforcement Learning](https://arxiv.org/abs/2504.16084)
 ### 知覚（Perception）
 知覚（Perception）は、エージェントがテキスト以外のモダリティ（画像、音声、実世界のセンサデータなど）を理解・認識する能力です。LLMの推論を強化するRLの成功に触発され、これらの成果をマルチモーダル学習へ応用する取り組みが進められています。
 
-Vision-R1^[[Vision-R1: Incentivizing Reasoning Capability in Multimodal Large Language Models](https://arxiv.org/abs/2503.06749)]は、画像とテキストを同時に理解するマルチモーダル大規模言語モデル（Multimodal Large Language Model、MLLM）を用いて、特に数学の図形問題のような複雑な視覚的推論タスクにおいて人間のような深い思考プロセスを再現することを目指しています。DeepSeek-R1のようにRLを用いて数学問題に対する推論能力を向上させるアプローチですが、単純にRLを適用するのではなく、「DeepSeek-R1の模倣学習」と「段階的思考抑制トレーニング（PTST）」という2段階の学習を組み合わせているのが特徴です。
- - 1段階目: MLLMを用いて視覚情報を詳細なテキスト記述に変換させるModality Bridgingを実施し、そのテキストをDeepSeek-R1に渡すことで詳細なCoTを出力させます。DeepSeek-R1のCoTを正解ラベルとしてMLLMをSFTで模倣学習することで、視覚情報に基づくCoTを安定的に生成できるようにします。
- - 2段階目: 1段階目終了時点ではCoTが長くなると性能が低下する傾向があることから、2段階目では思考の長さを制限し段階的に増やしながら、RLで視覚情報を含めた推論能力向上を行うPTSTを実施します。
+Vision-R1^[[Vision-R1: Incentivizing Reasoning Capability in Multimodal Large Language Models](https://arxiv.org/abs/2503.06749)]は、画像とテキストを同時に理解するマルチモーダル大規模言語モデル（Multimodal Large Language Model、MLLM）を用いて、特に数学の図形問題のような複雑な視覚的推論タスクにおいて人間のような深い思考プロセスを再現することを目指しています。DeepSeek-R1のようにRLを用いて数学問題に対する推論能力を向上させるアプローチですが、単純にRLを適用するのではなく、「DeepSeek-R1の模倣学習」と「段階的思考抑制トレーニング」という2段階の学習を組み合わせているのが特徴です。
+ - 1段階目: MLLMを用いて視覚情報を詳細なテキスト記述に変換させるModality Bridgingを実施し、そのテキストをDeepSeek-R1に渡すことで詳細なCoTを出力させます。DeepSeek-R1のCoTを正解ラベルとしてMLLMを模倣学習することで、視覚情報に基づくCoTを安定的に生成できるようにします。
+ - 2段階目: 1段階目終了時点ではCoTが長くなると性能が低下する傾向があることから、2段階目では思考の長さを制限し段階的に増やしながら、RLで視覚情報を含めた推論能力向上を行う段階的思考抑制トレーニングを実施します。
 ![](/images/agentic_rl/vision_r1.png)
 *Vision-R1: Incentivizing Reasoning Capability in Multimodal Large Language Models (https://arxiv.org/abs/2503.06749)*
 
 OPENTHINKIMG^[[OPENTHINKIMG: Learning to Think with Images via Visual Tool Reinforcement Learning](https://arxiv.org/abs/2505.08617)]は、視覚ツールを使って視覚的問題を解くための学習にRLを利用しています。
-具体的には、画像とテキストをVLMに入力し、グラフの数値を読み取るOCRツール、画像の一部を拡大するズームツールといった視覚的なツールをVLMが操作しながら視覚的問題を解きます。
-モデルは環境内でツールを自由に使い、ツールの利用結果を視覚情報としてインプットしながら、最終的なタスクの正解・不正解という報酬を最大化するように方策を更新していきます。特に、ツールの視覚的な出力をモデルの次の判断材料として直接利用する点が重要で、これにより、モデルは自らの行動が視覚的にどのような結果をもたらすかを理解しながら、より賢いツール選択ができるようになります。
+具体的には、画像とテキストをVLMに入力し、グラフの数値を読み取るOCRツール、画像の一部を拡大するズームツールといった視覚的なツールをVLMが操作しながら視覚的問題を解きます。モデルは環境内でツールを自由に使い、ツールの利用結果を視覚情報としてインプットしながら、最終的なタスクの正解・不正解という報酬を最大化するように方策を更新していきます。特に、ツールの視覚的な出力をモデルの次の判断材料として直接利用する点が重要で、これにより、モデルは自らの行動が視覚的にどのような結果をもたらすかを理解しながら、より賢いツール選択ができるようになります。
 ![alt text](/images/agentic_rl/openthinkimg.png)
 *OPENTHINKIMG: Learning to Think with Images via Visual Tool Reinforcement Learning (https://arxiv.org/abs/2505.08617)*
 
-Visual Planning^[[Visual Planning: Let’s Think Only with Images](https://arxiv.org/abs/2505.11409)]では、人間が頭の中で地図を思い浮かべたり、家具の配置をシミュレーションしたりするように、モデルが言語ではなく画像によってタスクの計画を立てることを目指しています。
-モデルは現在の画像状態から次の画像状態を複数候補生成し、前の状態と現在の状態との差分から行動（ナビゲーションの場合、上下左右の移動方向が行動に該当）をルールベースで算出します。このステップを繰り返し、ゴールに近づく場合に報酬を与えることで、ゴールまでの行動計画を画像ベースで学習します。
+Visual Planning^[[Visual Planning: Let’s Think Only with Images](https://arxiv.org/abs/2505.11409)]では、人間が頭の中で地図を思い浮かべたり、家具の配置をシミュレーションしたりするように、モデルが言語ではなく画像によってタスクの計画を立てることを目指しています。モデルは現在の画像状態から次の画像状態を複数候補生成し、前の状態と現在の状態との差分から行動（ナビゲーションの場合、上下左右の移動方向が行動に該当）をルールベースで算出します。このステップを繰り返し、ゴールに近づく場合に報酬を与えることで、ゴールまでの行動計画を画像ベースで学習します。
 ![](/images/agentic_rl/visual_planning.png)
 *Visual Planning: Let’s Think Only with Images (https://arxiv.org/abs/2505.11409)*
 
@@ -284,8 +281,7 @@ UI-TARS^[[UI-TARS: Pioneering Automated GUI Interaction with Native Agents](http
 *UI-TARS: Pioneering Automated GUI Interaction with Native Agents (https://arxiv.org/abs/2501.12326)*
 
 ### 身体性を持つエージェント
-身体性エージェント（Embodied Agents）は、ロボットのように物理的な環境でマルチモーダルな情報をもとに物理的な行動を実行するエージェントです。
-通常、Vision-Language Action（VLA）モデルを用いて模倣学習による事前学習を行い、事前学習済みモデルをインタラクティブなエージェントに組み込み、環境と相互作用させてRLすることで多様な実世界環境におけるモデルの汎化能力を高めます。VLAフレームワークにおけるRLは、複雑な環境での空間的推論と移動を重視するナビゲーションエージェントと、多様で動的な制約下で物理オブジェクトの精密な制御に焦点を当てるマニピュレーションエージェントの2つに大別されます。
+身体性エージェント（Embodied Agents）は、ロボットのように物理的な環境でマルチモーダルな情報をもとに物理的な行動を実行するエージェントです。Vision-Language Action（VLA）モデルを用いて模倣学習による事前学習を行い、事前学習済みモデルをインタラクティブなエージェントに組み込み、環境と相互作用させてRLすることで多様な実世界環境におけるモデルの汎化能力を高めるアプローチが一般的に取られています。VLAフレームワークにおけるRLは、複雑な環境での空間的推論と移動を重視するナビゲーションエージェントと、多様で動的な制約下で物理オブジェクトの精密な制御に焦点を当てるマニピュレーションエージェントの2つに大別されます。
 
 - ナビゲーションエージェント
 ナビゲーションエージェントにとって、計画（プランニング）が中心的な能力となります。VLAモデルの将来の行動系列を予測し最適化する能力を強化するためにRLが用いられます。一般的な戦略は、事前学習済みのVLAモデルと同じように1ステップごとの移動行動に対して報酬を与えてエージェントを訓練することです。
