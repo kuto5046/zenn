@@ -1,5 +1,5 @@
 ---
-title: "LLM×強化学習の新しいパラダイム：Agentic RLの研究動向"
+title: "LLM×強化学習の新しいパラダイム: Agentic RLの研究紹介"
 emoji: "🔥"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["強化学習", "LLM", "エージェント"]
@@ -108,7 +108,7 @@ Qwen3^[[Qwen3 Technical Report](https://arxiv.org/abs/2505.09388)]は複雑な�
 ツール使用は、エージェントが外部の情報源やAPI、計算資源などを呼び出して活用する能力です。検索エンジンでの情報取得や電卓・コード実行、他のモデルへのクエリなど、タスク達成に必要なあらゆる外部ツールとのインタラクションを含みます。RLによりエージェントは **「どのタイミングで、どのツールを、どう使うか」** を試行錯誤から学び取れるようになります。発展の流れは大きく3段階あります。
 ![alt text](/images/agentic_rl/tool_history.png)
 #### ReAct形式のツール利用
-エージェントのツール利用について、初期はReAct^[[ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)]と呼ばれるプロンプトベースの手法や、Toolformer^[[Toolformer: Language Models Can Teach Themselves to Use Tools](https://arxiv.org/abs/2302.04761)]と呼ばれる教師ありファインチューニング（Supervised Fine-Tuning、SFT）によって、ツール利用プロセスを模倣しツール利用能力を獲得する手法が試みられました。しかし、SFTはいわゆる模倣学習であるため未知のツールへの汎化が難しく、柔軟性に欠けます。また、ツール利用履歴データを用意するコストもあることから、RLを用いてアウトカムベースでツール利用戦略を学習する試みが始まりました。
+エージェントのツール利用について、初期はReAct^[[ReAct: Synergizing Reasoning and Acting in Language Models](https://arxiv.org/abs/2210.03629)]と呼ばれるプロンプトベースの手法や、Toolformer^[[Toolformer: Language Models Can Teach Themselves to Use Tools](https://arxiv.org/abs/2302.04761)]と呼ばれるツール利用プロセスをSFTで模倣学習しツール利用能力を獲得する手法が試みられました。しかし、SFTはいわゆる模倣学習であるため未知のツールへの汎化が難しく、柔軟性に欠けます。また、ツール利用履歴データを用意するコストもあることから、RLを用いてアウトカムベースでツール利用戦略を学習する試みが始まりました。
 
 #### ツール統合型RL (Tool-Integrated RL)
 次の段階では、ツール使用をLLMの認知ループに深く組み込み、複数ターンにわたってツールを使いこなすエージェントシステムが登場しました。ここではRLが導入され、どの局面でツールを呼ぶか、得た情報をどう活用するかを報酬に基づき学習します。
@@ -190,7 +190,7 @@ TTRL^[[TTRL: Test-Time Reinforcement Learning](https://arxiv.org/abs/2504.16084)
 知覚（Perception）は、エージェントがテキスト以外のモダリティ（画像、音声、実世界のセンサデータなど）を理解・認識する能力です。LLMの推論を強化するRLの成功に触発され、これらの成果をマルチモーダル学習へ応用する取り組みが進められています。
 
 Vision-R1^[[Vision-R1: Incentivizing Reasoning Capability in Multimodal Large Language Models](https://arxiv.org/abs/2503.06749)]は、画像とテキストを同時に理解するマルチモーダル大規模言語モデル（Multimodal Large Language Model、MLLM）を用いて、特に数学の図形問題のような複雑な視覚的推論タスクにおいて人間のような深い思考プロセスを再現することを目指しています。DeepSeek-R1のようにRLを用いて数学問題に対する推論能力を向上させるアプローチですが、単純にRLを適用するのではなく、「DeepSeek-R1の模倣学習」と「段階的思考抑制トレーニング（PTST）」という2段階の学習を組み合わせているのが特徴です。
- - 1段階目: MLLMを用いて視覚情報を詳細なテキスト記述に変換させるModality Bridgingを実施し、そのテキストをDeepSeek-R1に渡すことで詳細なCoTを出力させます。DeepSeek-R1のCoTを正解ラベルとしてMLLMを教師ありファインチューニング（Supervised Fine-Tuning、SFT）することで、視覚情報に基づくCoTを安定的に生成できるようにします。
+ - 1段階目: MLLMを用いて視覚情報を詳細なテキスト記述に変換させるModality Bridgingを実施し、そのテキストをDeepSeek-R1に渡すことで詳細なCoTを出力させます。DeepSeek-R1のCoTを正解ラベルとしてMLLMをSFTで模倣学習することで、視覚情報に基づくCoTを安定的に生成できるようにします。
  - 2段階目: 1段階目終了時点ではCoTが長くなると性能が低下する傾向があることから、2段階目では思考の長さを制限し段階的に増やしながら、RLで視覚情報を含めた推論能力向上を行うPTSTを実施します。
 ![](/images/agentic_rl/vision_r1.png)
 *Vision-R1: Incentivizing Reasoning Capability in Multimodal Large Language Models (https://arxiv.org/abs/2503.06749)*
