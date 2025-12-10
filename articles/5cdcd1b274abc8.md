@@ -63,6 +63,12 @@ https://www.kaggle.com/competitions/ai-mathematical-olympiad-progress-prize-2/wr
 ```
 :::
 
+:::details 添付画像
+![](/images/5cdcd1b274abc8/eedi.png)
+![](/images/5cdcd1b274abc8/handm.png)
+![](/images/5cdcd1b274abc8/luxais3.png)
+:::
+
 生成結果
 ![](/images/5cdcd1b274abc8/sample2.png)
 ![](/images/5cdcd1b274abc8/sample1.png)
