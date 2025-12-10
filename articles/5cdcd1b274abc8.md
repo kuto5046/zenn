@@ -19,6 +19,7 @@ https://note.com/google_gemini/n/n064d03afe2c0
 
 ## 実験条件
 現在私はAIMO3というコンペに参加しているので、その過去コンペであるAIMO2の1位解法を図解の題材として利用したいと思います。
+解法内には画像も含まれているのですが、今回はテキスト部分のみを利用して図解を生成することにします。
 https://www.kaggle.com/competitions/ai-mathematical-olympiad-progress-prize-2/writeups/nemoskills-1st-place-solution-nemoskills
 
 今回は以下の方法で画像生成を試すことにします。
@@ -26,11 +27,11 @@ https://www.kaggle.com/competitions/ai-mathematical-olympiad-progress-prize-2/wr
 - 解法+過去の図解画像
 - 解法+指示テキスト
 
-生成される解法画像は実行のたびに異なる結果となるため、複数回生成したものからピックアップして紹介します。(他の生成結果も貼ってるので見比べるとブレや傾向がわかるかと思います.)
+生成される解法画像は実行のたびに異なる結果となるため、複数回生成したものを貼っています。見比べるとブレや傾向がわかるかと思います.
 
 ## 結果
 ### 1.解法のみ
-まずは、生成画像のベースラインを確認するために、解法テキストのみを入力として生成を試みてみましょう。
+まずは、生成画像のベースラインを確認するために、解法テキストのみを入力として生成を試してみます。
 
 :::details プロンプト
 ```markdown
@@ -43,9 +44,17 @@ https://www.kaggle.com/competitions/ai-mathematical-olympiad-progress-prize-2/wr
 ```
 :::
 
+#### 生成結果
 ![](/images/5cdcd1b274abc8/sample7.png)
 ![](/images/5cdcd1b274abc8/sample5.png)
 ![](/images/5cdcd1b274abc8/sample6.png)
+
+#### 感想
+- アイコンを適切に利用している
+- 色の統一感がある
+- Data, Training, Inferenceの3部構成が共通
+- 解法と整合しない図解も一部ある
+
 
 ### 2.解法+過去の図解画像
 解法に加えて、過去に私が作成した他コンペの図解画像を入力に事例として追加し生成したのがこちらです。
@@ -69,15 +78,18 @@ https://www.kaggle.com/competitions/ai-mathematical-olympiad-progress-prize-2/wr
 ![](/images/5cdcd1b274abc8/luxais3.png)
 :::
 
-生成結果
+#### 生成結果
 ![](/images/5cdcd1b274abc8/sample2.png)
 ![](/images/5cdcd1b274abc8/sample1.png)
 ![](/images/5cdcd1b274abc8/sample3.png)
 <!-- ![](/images/5cdcd1b274abc8/sample4.png) -->
 
+#### 感想
+- 構成が過去の図解画像に近づいている
+- アイコンが色ありになっている
+- 文章が増えている
+- 過去画像に寄せるために与えていない情報(順位、コンペ名、チーム名など)を推測で入れてハルシネーションが発生している
+- 見た目はこちらの方が好み
 
 ### 3.解法+指示テキスト
 
-
-
-## 感想
