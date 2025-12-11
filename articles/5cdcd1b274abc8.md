@@ -7,7 +7,7 @@ published: true
 ---
 
 ## はじめに
-この記事はKaggle Advent Calendar 2025の12日目の記事です。
+この記事は[Kaggle Advent Calendar 2025](https://qiita.com/advent-calendar/2025/kaggle)の12日目の記事です。
 私は先日開催された関西Kaggler会にて解法を図解する技術について発表しました。
 https://www.docswell.com/s/kuto1963222/ZX6772-2025-11-14-170808#p1
 ![](/images/5cdcd1b274abc8/slide.png)
