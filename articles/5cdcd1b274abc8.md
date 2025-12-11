@@ -21,6 +21,7 @@ https://note.com/google_gemini/n/n064d03afe2c0
 
 ### 題材
 現在私はAIMO3というコンペに参加しているので、その過去コンペであるAIMO2の1位解法を図解の題材として利用したいと思います。解法内には画像も含まれているのですが、今回はテキスト部分のみを利用して図解を生成することにします。
+なお前提としてKaggleのWriteup(解法提出)として利用することを想定しているため、解法の図解は英語で生成するようにしています。
 https://www.kaggle.com/competitions/ai-mathematical-olympiad-progress-prize-2/writeups/nemoskills-1st-place-solution-nemoskills
 
 ### モデル
@@ -33,7 +34,6 @@ https://gemini.google.com/app?hl=ja
 - 解法+過去の図解画像
 - 解法+指示テキスト
 
-なお前提としてKaggleのWriteup(解法提出)として利用することを想定しているため英語で生成するようにしています。
 生成される解法画像は実行のたびに異なる結果となるため、複数回生成したものを貼っています。見比べるとブレや傾向がわかるかと思います。
 
 ## 結果
