@@ -1,9 +1,9 @@
 ---
-title: "Nano Banana Proで解法を図解する"
+title: "Nano Banana ProでKaggle解法を図解する"
 emoji: "🍌"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["kaggle"]
-published: false
+topics: ["Kaggle", "Gemini", "Nano Banana"]
+published: true
 ---
 
 ## はじめに
