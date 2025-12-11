@@ -236,7 +236,7 @@ https://gemini.google.com/app?hl=ja
 
 #### 生成結果
 ![](/images/5cdcd1b274abc8/sample9.png)
-![](/images/5cdcd1b274abc8/sample10.png)
+![](/images/5cdcd1b274abc8/sample12.png)
 ![](/images/5cdcd1b274abc8/sample11.png)
 
 指示テキストを追加するだけでかなり想定する形に近いものが生成できています。個人的にはテキスト情報の増加や色使いによって若干視認性が気になる点もありますが、このレベルまで生成できるのであればかなり実用的だと感じました。Nano Banana Proすごいです。
